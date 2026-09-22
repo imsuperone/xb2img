@@ -1,5 +1,5 @@
 # astrbot_plugin_xb2img/main.py
-# 双图：APNG 第1帧=A、点开播B，原图直发，零多余残留。
+# xb2img：APNG 第1帧=A、点开播B，原图直发，零多余残留。
 import asyncio
 import base64
 import io
@@ -33,8 +33,8 @@ MAX_WAIT = 4
 QUEUE_TIMEOUT = 120
 FETCH_TIMEOUT = 10
 SEND_TIMEOUT = 20
-_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AstrBot-dual-png"
-_PREFIXES = ("/双图", "双图", "/dual", "dual")
+_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AstrBot-xb2img"
+_PREFIXES = ("/xb2img", "xb2img")
 
 
 def _parse(text):
@@ -179,12 +179,12 @@ class _JobGate:
 _GATE = _JobGate()
 
 
-class DualPngPlugin(Star):
+class Xb2imgPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
 
-    @filter.command("双图", alias=["dual", "shuangtu"])
-    async def dual(self, event: AstrMessageEvent):
+    @filter.command("xb2img")
+    async def xb2img(self, event: AstrMessageEvent):
         t0 = time.time()
         refs, apng = _parse(event.message_str or "")
         for r in _chain_images(event):
@@ -192,8 +192,8 @@ class DualPngPlugin(Star):
                 refs.append(r)
         if len(refs) < 2:
             yield event.plain_result(
-                "用法：/双图 <预览图A> <原图B> [--apng]\n"
-                "示例：/双图 ./a.jpg ./b.jpg\n"
+                "用法：/xb2img <预览图A> <原图B> [--apng]\n"
+                "示例：/xb2img ./a.jpg ./b.jpg\n"
                 "也支持指令后直接附带两张图。\n"
                 "合成 APNG 无限循环（第1帧=A，点开播B），默认 .png 发出；\n"
                 "加 --apng 则改用 .apng 后缀。"
@@ -211,7 +211,7 @@ class DualPngPlugin(Star):
         out_path = None
         try:
             with suppress(Exception):
-                r = await _raw_send(event, [{"type": "text", "data": {"text": "正在处理双图中..."}}])
+                r = await _raw_send(event, [{"type": "text", "data": {"text": "正在处理 xb2img 中..."}}])
                 prog = (r or {}).get("message_id")
             try:
                 await _GATE.wait_turn()
@@ -231,11 +231,11 @@ class DualPngPlugin(Star):
                     asyncio.to_thread(_fetch_bytes_sync, refs[1]),
                 )
             except Exception:
-                logger.exception("[双图] 读取失败")
+                logger.exception("[xb2img] 读取失败")
                 yield event.plain_result("图片读取失败（链接失效/文件缺失/超20MB/非图片）")
                 return
             suffix = ".apng" if apng else ".png"
-            fd, tmps = tempfile.mkstemp(prefix="dual_", suffix=suffix, dir=str(TMP_ROOT))
+            fd, tmps = tempfile.mkstemp(prefix="xb2img_", suffix=suffix, dir=str(TMP_ROOT))
             try:
                 import os as _os
                 _os.close(fd)
@@ -244,13 +244,13 @@ class DualPngPlugin(Star):
             out_path = Path(tmps)
             try:
                 await asyncio.to_thread(
-                    make_dual_apng_sync, a_blob, b_blob,
+                    make_xb2img_apng_sync, a_blob, b_blob,
                     str(out_path), MAX_EDGE, TARGET_BYTES)
             except ImportError:
                 yield event.plain_result("合成失败：缺 Pillow，请 pip install Pillow>=10.0.0")
                 return
             except Exception as e:
-                logger.exception("[双图] 合成失败")
+                logger.exception("[xb2img] 合成失败")
                 yield event.plain_result(f"合成失败：{type(e).__name__}")
                 return
             size = out_path.stat().st_size
@@ -259,14 +259,14 @@ class DualPngPlugin(Star):
                 "summary": "[动图]", "sub_type": 0}}
             try:
                 await _raw_send(event, [seg])
-                logger.info(f"[双图] 通道 file直发 {out_path.name} {time.time()-t0:.1f}s {size//1024}KB")
+                logger.info(f"[xb2img] 通道 file直发 {out_path.name} {time.time()-t0:.1f}s {size//1024}KB")
             except Exception:
                 if size <= MAX_B64_TOTAL:
                     blob = await asyncio.to_thread(out_path.read_bytes)
                     seg["data"]["file"] = "base64://" + base64.b64encode(blob).decode()
                     try:
                         await _raw_send(event, [seg])
-                        logger.info(f"[双图] 通道 base64重试 {out_path.name}")
+                        logger.info(f"[xb2img] 通道 base64重试 {out_path.name}")
                     except Exception as e2:
                         yield event.plain_result(f"发送失败：{type(e2).__name__}")
                         return
@@ -312,7 +312,7 @@ def _fit_contain(im, target_size, resample):
     return canvas
 
 
-def make_dual_apng_sync(a_blob, b_blob, output_path,
+def make_xb2img_apng_sync(a_blob, b_blob, output_path,
                         max_edge=MAX_EDGE, target_bytes=TARGET_BYTES):
     # 解码只做一次；B 等比 contain 进 A 画布，避免拉伸；B 只存 1 帧。
     try:
@@ -361,7 +361,7 @@ def make_dual_apng_sync(a_blob, b_blob, output_path,
                 break
         with open(output_path, "wb") as f:
             f.write(last_blob)
-        logger.info(f"[双图] APNG 输出 {len(last_blob)//1024}KB")
+        logger.info(f"[xb2img] APNG 输出 {len(last_blob)//1024}KB")
         return output_path
     finally:
         with suppress(Exception):

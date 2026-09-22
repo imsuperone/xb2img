@@ -1,7 +1,7 @@
 name: astrbot_plugin_xb2img
-display_name: 双图
+display_name: xb2img
 desc: 两张图合成一张图 未点开显示A点开加载原图后显示B
-version: 1.0.7
+version: 1.0.8
 author: Light
 repo: https://github.com/imsuperone/xb2img
 support_platforms: [aiocqhttp]
