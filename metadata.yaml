@@ -1,7 +1,14 @@
 name: astrbot_plugin_xb2img
 display_name: 双图
-desc: 两张图合成一张图 未点开显示A点开加载原图后显示B
-version: 1.0.10
+short_desc: 两张图片合成一张 APNG 动图，列表显示 A，点开原图播放 B。
+desc: |
+  双图：两张图片合成为一张 APNG 动图。
+
+  - 列表显示图 A，点开原图后播放图 B
+  - 全彩无损，自适应压缩至约 1MB
+  - 经 OneBot11 原图通道直发，避免平台转码
+  - 最多 5 个任务并发排队，临时文件用后即清
+version: 1.0.11
 author: Light
 repo: https://github.com/imsuperone/xb2img
 support_platforms: [aiocqhttp]
