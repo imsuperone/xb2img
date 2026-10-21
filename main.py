@@ -37,6 +37,18 @@ _UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AstrBot-xb2img"
 _PREFIXES = ("/xb2img", "xb2img")
 
 
+def _read_version():
+    try:
+        meta = PLUGIN_DIR / "metadata.yaml"
+        if meta.is_file():
+            for line in meta.read_text(encoding="utf-8").splitlines():
+                if line.strip().startswith("version:"):
+                    return line.split(":", 1)[1].strip().strip('"').strip("'")
+    except Exception:
+        pass
+    return "1.0.12"
+
+
 def _parse(text):
     t = (text or "").strip()
     for p in _PREFIXES:
@@ -182,6 +194,21 @@ _GATE = _JobGate()
 class Xb2imgPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
+        try:
+            reg = getattr(context, "register_web_api", None)
+            if callable(reg):
+                reg("/astrbot_plugin_xb2img/version", self._api_get_version, ["GET"], "获取插件版本号")
+        except Exception:
+            pass
+
+    async def _api_get_version(self):
+        ver = _read_version()
+        data = {"ok": True, "status": "ok", "version": ver, "plugin": "astrbot_plugin_xb2img"}
+        try:
+            from aiohttp.web import json_response
+            return json_response(data)
+        except Exception:
+            return data
 
     @filter.command("xb2img")
     async def xb2img(self, event: AstrMessageEvent):

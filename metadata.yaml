@@ -8,7 +8,7 @@ desc: |
   - 全彩无损，自适应压缩至约 1MB
   - 经 OneBot11 原图通道直发，避免平台转码
   - 最多 5 个任务并发排队，临时文件用后即清
-version: 1.0.11
+version: 1.0.12
 author: Light
 repo: https://github.com/imsuperone/xb2img
 support_platforms: [aiocqhttp]

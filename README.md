@@ -1,4 +1,4 @@
-# 双图 v1.0.11
+# 双图 v1.0.12
 
 > 两张图片合成为一张 APNG 动图：列表显示图 A，点开原图后播放图 B。
 
@@ -9,7 +9,7 @@
 本插件基于 [AstrBot](https://github.com/AstrBotDevs/AstrBot) 开发。AstrBot 是一个松耦合、异步、支持多消息平台部署，具有易用的插件系统和完善的大语言模型（LLM）接入功能的聊天机器人及开发框架，使用文档见 [docs.astrbot.app](https://docs.astrbot.app)。
 
 - 插件 ID：`astrbot_plugin_xb2img`
-- 当前版本：`v1.0.11`
+- 当前版本：`v1.0.12`
 - 运行要求：AstrBot `>=3.4.0`，平台 `aiocqhttp`
 - 仓库：https://github.com/imsuperone/xb2img
 
