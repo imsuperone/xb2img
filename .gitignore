@@ -1,3 +1,36 @@
 __pycache__/
+*.py[cod]
 tmp/
+temp/
 fax_seq.dat
+
+# Secrets & credentials (strict privacy protection)
+.env
+.env.*
+*.key
+*.pem
+*.cert
+*.crt
+*.token
+*.secret
+credentials.json
+auth.json
+secrets.json
+webdav_secret.json
+**/webdav_secret.json
+
+# Databases & logs
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.log
+
+# IDE & OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+.omo/
